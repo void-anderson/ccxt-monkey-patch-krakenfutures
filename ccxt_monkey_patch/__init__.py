@@ -1,4 +1,3 @@
-from types import ModuleType
 from ccxt.base.types import Entry
 import ccxt
 
@@ -13,7 +12,7 @@ def patch_entry(kf):
     kf.privatePostOrdersStatus = entry
     return kf
 
-def patch(ccxt: ModuleType) -> ModuleType:
+def get_kf_patch():
     kf = ccxt.krakenfutures()
 
     # Patch ImplicitAPI entries
@@ -27,4 +26,4 @@ def patch(ccxt: ModuleType) -> ModuleType:
 
     return kf 
 
-patch(ccxt)
+get_kf_patch(ccxt)
