@@ -12,6 +12,9 @@ def patch_entry(kf):
     kf.privatePostOrdersStatus = entry
     return kf
 
+def create_order_status_request()
+    pass
+
 def get_kf_patch():
     kf = ccxt.krakenfutures()
 
