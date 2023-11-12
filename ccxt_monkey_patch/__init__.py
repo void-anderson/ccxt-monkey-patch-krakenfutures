@@ -1,18 +1,7 @@
 from typing import Optional
 from ccxt import krakenfutures as KrakenFuturesCCXT
 from ccxt.base.types import Entry
-
-def patch_entry(kf):
-    entry = Entry(
-        'orders/status', 
-        'private', 
-        'POST', 
-        {},
-    )
-    kf.private_post_orders_status = entry
-    kf.privatePostOrdersStatus = entry
-    return kf
-
+import types
 
 def get_kf_patch(krakenfutures):
     kf = krakenfutures({ 
@@ -21,13 +10,16 @@ def get_kf_patch(krakenfutures):
 
     # add api
     kf.api['private']['post'].append('orders/status')
-
-    # Patch ImplicitAPI entries
-    kf = patch_entry(kf)
-
     return kf 
 
 class KrakenFutures(KrakenFuturesCCXT):
+
+    private_post_orders_status = privatePostOrdersStatus = Entry(
+        'orders/status', 
+        'private', 
+        'POST', 
+        {},
+    ) 
 
     def fetch_order(
         self, 
@@ -36,7 +28,7 @@ class KrakenFutures(KrakenFuturesCCXT):
         params={}
     ):
         self.load_markets()
-        orderIds = [id,]
+        orderIds = id
         request = self.extend({'orderIds': orderIds}, params)
         response = self.privatePostOrdersStatus(request)
         data = self.safe_value(response, 'orders', [])

@@ -1,20 +1,57 @@
+import os
 import unittest
 
-class TestStringMethods(unittest.TestCase):
+# Get the two below from futures-demo.kraken.com
+api_key = os.getenv('API_KEY', None)
+api_secret = os.getenv('API_SECRET', None)
+dev = False 
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
+from ccxt_monkey_patch import KrakenFutures, get_kf_patch
 
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
+kf = None
 
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+class TestCCXT(unittest.TestCase):
+    kf = get_kf_patch(KrakenFutures)
+    kf.set_sandbox_mode(True)
+    kf.verbose = True
+    kf.apiKey = api_key
+    kf.secret = api_secret
+
+    def test_connection(self):
+        # Set API_KEY and SECRET
+        self.assertNotEqual(api_key, None)
+        self.assertNotEqual(api_secret, None)
+
+    def test_can_fetch_balance(self):
+        balance = self.__class__.kf.fetch_balance()
+        print("fetching balance...")
+        if dev:
+            print(balance)
+
+    def test_can_fetch_markets(self):
+        markets = self.__class__.kf.fetch_markets()
+        print("fetching markets...")
+        if dev:
+            print(markets)
+
+    def test_can_get_order_status(self):
+        # Create an Order
+        order = self.__class__.kf.create_order(
+            'ETH/USD:ETH-231229',
+            'limit',
+            'sell',
+            1,
+            float(2000)
+        )
+        # get open orders
+        orders = self.__class__.kf.fetch_open_orders(
+            'ETH/USD:ETH-231229',
+        )
+        order_id = orders[0]['info']['order_id']
+        # get order status
+        status = self.__class__.kf.fetch_order(order_id)
+        print(status)
+        
 
 if __name__ == '__main__':
     unittest.main()
