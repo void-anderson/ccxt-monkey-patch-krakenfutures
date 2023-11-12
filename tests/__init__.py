@@ -4,7 +4,6 @@ import unittest
 # Get the two below from futures-demo.kraken.com
 api_key = os.getenv('API_KEY', None)
 api_secret = os.getenv('API_SECRET', None)
-dev = False 
 
 from ccxt_monkey_patch import KrakenFutures, get_kf_patch
 
