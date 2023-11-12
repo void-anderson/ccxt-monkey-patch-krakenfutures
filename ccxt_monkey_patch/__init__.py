@@ -36,3 +36,8 @@ class KrakenFutures(KrakenFuturesCCXT):
         params={}
     ):
         self.load_markets()
+        orderIds = [id,]
+        request = self.extend({'orderIds': orderIds}, params)
+        response = self.privatePostOrdersStatus(request)
+        data = self.safe_value(response, 'orders', [])
+        return self.parse_orders(data)
