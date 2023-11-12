@@ -25,18 +25,14 @@ class TestCCXT(unittest.TestCase):
     def test_can_fetch_balance(self):
         balance = self.__class__.kf.fetch_balance()
         print("fetching balance...")
-        if dev:
-            print(balance)
 
     def test_can_fetch_markets(self):
-        markets = self.__class__.kf.fetch_markets()
+        self.__class__.kf.fetch_markets()
         print("fetching markets...")
-        if dev:
-            print(markets)
 
     def test_can_get_order_status(self):
         # Create an Order
-        order = self.__class__.kf.create_order(
+        self.__class__.kf.create_order(
             'ETH/USD:ETH-231229',
             'limit',
             'sell',
@@ -44,13 +40,12 @@ class TestCCXT(unittest.TestCase):
             float(2000)
         )
         # get open orders
-        orders = self.__class__.kf.fetch_open_orders(
+        self.__class__.kf.fetch_open_orders(
             'ETH/USD:ETH-231229',
         )
         order_id = orders[0]['info']['order_id']
         # get order status
-        status = self.__class__.kf.fetch_order(order_id)
-        print(status)
+        self.__class__.kf.fetch_order(order_id)
         
 
 if __name__ == '__main__':
