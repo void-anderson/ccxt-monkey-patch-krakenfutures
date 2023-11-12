@@ -1,4 +1,4 @@
-import ccxt
+from typing import Optional
 from ccxt import krakenfutures as KrakenFuturesCCXT
 from ccxt.base.types import Entry
 
@@ -29,5 +29,10 @@ def get_kf_patch(krakenfutures):
 
 class KrakenFutures(KrakenFuturesCCXT):
 
-    def create_order_status_request(self, cliOrdIds):
-        pass
+    def fetch_order(
+        self, 
+        id: str, 
+        symbol: Optional[str] = None, 
+        params={}
+    ):
+        self.load_markets()
