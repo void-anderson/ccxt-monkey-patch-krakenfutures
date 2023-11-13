@@ -1,0 +1,47 @@
+diff --git a/python/ccxt/abstract/krakenfutures.py b/python/ccxt/abstract/krakenfutures.py
+index ac2c49996c9..63395b18f7f 100644
+--- a/python/ccxt/abstract/krakenfutures.py
++++ b/python/ccxt/abstract/krakenfutures.py
+@@ -26,6 +26,7 @@ class ImplicitAPI:
+     private_post_cancelallorders = privatePostCancelallorders = Entry('cancelallorders', 'private', 'POST', {})
+     private_post_cancelallordersafter = privatePostCancelallordersafter = Entry('cancelallordersafter', 'private', 'POST', {})
+     private_post_withdrawal = privatePostWithdrawal = Entry('withdrawal', 'private', 'POST', {})
++    private_post_orders_status = privatePostOrdersStatus = Entry('orders/status', 'private', 'POST', {})
+     private_put_leveragepreferences = privatePutLeveragepreferences = Entry('leveragepreferences', 'private', 'PUT', {})
+     private_put_pnlpreferences = privatePutPnlpreferences = Entry('pnlpreferences', 'private', 'PUT', {})
+     charts_get_price_type_symbol_interval = chartsGetPriceTypeSymbolInterval = Entry('{price_type}/{symbol}/{interval}', 'charts', 'GET', {})
+diff --git a/python/ccxt/krakenfutures.py b/python/ccxt/krakenfutures.py
+index 4181ebd9dd9..fadd49577be 100644
+--- a/python/ccxt/krakenfutures.py
++++ b/python/ccxt/krakenfutures.py
+@@ -73,7 +73,7 @@ class krakenfutures(Exchange, ImplicitAPI):
+                 'fetchMyTrades': True,
+                 'fetchOHLCV': True,
+                 'fetchOpenOrders': True,
+-                'fetchOrder': False,
++                'fetchOrder': True,
+                 'fetchOrderBook': True,
+                 'fetchOrders': False,
+                 'fetchPositions': True,
+@@ -138,6 +138,7 @@ class krakenfutures(Exchange, ImplicitAPI):
+                         'batchorder',
+                         'cancelallorders',
+                         'cancelallordersafter',
++                        'orders/status',
+                         'withdrawal',                              # for futures wallet -> kraken spot wallet
+                     ],
+                     'put': [
+@@ -974,6 +975,13 @@ class krakenfutures(Exchange, ImplicitAPI):
+         order['info'] = response
+         return order
+ 
++    def fetch_order(self, id:str, symbol: Optional[str] = None, params={}):
++        self.load_markets()
++        request = self.extend({'orderIds': id}, params)
++        response = self.privatePostOrdersStatus(request)
++        data = self.safe_value(response, 'orders', [])
++        return self.parse_orders(data)
++
+     def cancel_order(self, id: str, symbol: Optional[str] = None, params={}):
+         """
+         :see: https://docs.futures.kraken.com/#http-api-trading-v3-api-order-management-cancel-order
